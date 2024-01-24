@@ -1,0 +1,18 @@
+{
+  "smtp" : {
+    "host" : "smtp.gmail.com",
+    "port" : 587,
+    "auth" : {
+      "user" : "bingbing57575757@gmail.com",
+      "pass" : "qaxzzdyldydaojzy"
+    }
+  },
+  "imap" : {
+    "host" : "imap.gmail.com",
+    "port" : 993,
+    "auth" : {
+      "user" : "bingbing57575757@gmail.com",
+      "pass" : "qaxzzdyldydaojzy"
+    }
+  }
+}
