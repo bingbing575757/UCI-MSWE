@@ -1,0 +1,148 @@
+2-1（改了Main3和JD2，也就是加了syn。。）
+
+测试：
+在A2_1的Main里填充了，但是未加syn，会出现错乱
+
+补充：
+JDisplay和HWDisplay的目的：
+是创建一个简单的图形界面，用于显示字符矩阵。通过 JDisplay 类，你可以设置字符在矩阵中的位置并在界面上显示。
+
+之所以要在JD里加syn是因为有共用的usedrows和text
+
+2-2（！图片路径！只改了TrafficController）
+try。。catch是捕捉异常情况，eg：线程中断
+
+Car：
+这段 Java 代码描述了一个简单的汽车模拟程序。它包含一个 Car 类，实现了 Runnable 接口，代表在桥上行驶的汽车。
+主要功能和目的包括：
+模拟车辆行驶：move() 方法模拟车辆在桥上的移动过程，根据车辆类型（红色车辆或蓝色车辆）和桥上其他车辆的位置来调整车辆的位置和行驶方向。
+线程控制：run() 方法是 Runnable 接口的实现，表示车辆的运行过程。车辆通过线程进行模拟，每个车辆都是一个线程，它们可以在桥上自由移动，遵循一定的行驶规则。
+桥上控制：TrafficController 控制了车辆进入和离开桥的时机，确保车辆不会发生碰撞或混乱行驶。
+图像绘制：draw() 方法用于在图形界面中绘制车辆。
+这段代码模拟了两辆车在桥上行驶的情景，根据车辆的类型和桥上其他车辆的位置，控制车辆在桥上的移动和行驶方向，并通过线程模拟实现了这个过程。
+Main：
+这段代码创建了一个 Main 类，在 main() 方法中执行以下操作：
+创建 CarWindow 实例：通过 CarWindow win = new CarWindow() 创建了一个名为 win 的 CarWindow 实例。
+显示窗口：使用 win.pack() 和 win.setVisible(true) 方法使窗口可见，并且适应组件的大小。
+创建后台线程：通过 new Thread(...).start() 创建了一个新的后台线程。这个线程是一个匿名 Runnable 实现，其 run() 方法包含一个无限循环，每 25 毫秒调用 win.repaint() 来不断重绘 CarWindow 窗口。
+这段代码的目的是创建一个包含车辆动态运行的 CarWindow 窗口，并通过后台线程持续刷新窗口，以便实现动画效果。
+
+3-1（2个回答都可以：eg：只是在三个那儿加了syn）
+代码是要增删打印，其中删是删包括‘a’的
+方法有公用资源people，用syn或者ConcurrentHashMap
+
+
+补充：一个线程可能正在删除元素，而另一个线程可能在同时或稍后尝试访问相同的元素
+
+3-2（三个方法那儿加syn）
+源代码会报错，原因如下：
+
+ConcurrentModificationException: 如果在一个线程（比如Deleter 线程）正在删除 Vector 的最后一个元素时，另一个线程（如Getter 线程）同时在尝试获取 Vector 的最后一个元素，这可能导致 ConcurrentModificationException。因为在删除元素时，Vector 内部状态发生了变化，导致正在遍历的另一个线程尝试访问已经改变的 Vector。
+
+ArrayIndexOutOfBoundsException: 如果在deleteLast() 方法执行时，由于线程之间的并发性，另一个线程尝试访问了空的 Vector，可能会导致 ArrayIndexOutOfBoundsException 异常。
+
+NullPointerException: 如果在 getLast() 或 deleteLast() 方法中 people 是 null，这两个方法中使用 people 可能会导致 NullPointerException。
+
+这些异常会在多线程并发访问Vector时发生，特别是在一个线程正在修改 Vector 结构（添加或删除元素）时，另一个线程尝试访问该 Vector。要解决这些问题，需要采取线程安全的方法来访问 Vector 或使用线程安全的容器（如 ConcurrentHashMap 或 CopyOnWriteArrayList）。同时，在访问共享资源时确保同步和正确的互斥操作。
+
+
+3-3(补充阻塞队列，拓展messagequeue)
+原子性操作： 阻塞队列的操作（比如 put() 和 take()）是原子性的。每个元素的添加或移除是一个原子性操作，不会被其他线程中断或干扰，确保了队列操作的一致性。
+
+内部锁机制： 阻塞队列内部使用了锁机制，确保了对队列的并发访问的线程安全性。在并发环境中，当一个线程在进行队列操作时，其他线程会等待锁释放后再进行操作，避免了数据不一致问题。
+Atomic Operations: The operations on the blocking queue (such as put() and take()) are atomic. Each addition or removal of an element is an atomic operation, not susceptible to interruption or interference from other threads, ensuring consistency in queue operations.
+
+Internal Locking Mechanism: The blocking queue employs a locking mechanism internally, ensuring thread safety for concurrent access to the queue. In a concurrent environment, when one thread is performing queue operations, other threads wait for the lock to be released before proceeding with their operations, preventing data inconsistency issues.
+因此，多个生产者和消费者通过阻塞队列进行通信时，队列内部的锁机制和原子性操作保障了数据的一致性，从而确保了线程安全。
+阻塞队列（Blocking Queue）是一种特殊类型的队列，它在队列为空时获取元素的操作会被阻塞，直到队列中有新的元素出现；而在队列已满时添加元素的操作也会被阻塞，直到队列中有空间可以容纳新的元素。
+这种阻塞队列的特性使得多线程访问时不会出现数据不一致或者并发问题，因此可以保障线程安全。The characteristics of this blocking queue prevent data inconsistency or concurrency issues when accessed by multiple threads, thereby ensuring thread safety.
+这种队列通常用于多线程或并发编程中，作为线程之间进行数据交换的一种安全机制。阻塞队列提供了一种在队列为空或已满时进行线程等待的机制，避免了线程间的竞争和不必要的轮询。在 Java 中，BlockingQueue 接口及其实现类提供了这种阻塞特性，典型的实现包括 ArrayBlockingQueue、LinkedBlockingQueue、PriorityBlockingQueue 等。
+
+生产者和消费者数量不同的话，要额外放‘stop’
+
+3-4（在2-1原代码基础上只修改main3来解决问题，加了Semaphore ）
+在这段代码中，Semaphore 是一个并发控制工具，用于控制对共享资源的访问。它提供了一种计数信号量的机制，可以限制同时访问共享资源的线程数量。
+
+Semaphore 的作用
+控制并发访问: Semaphore 维护了一个可被获取的许可证（permit）数量，线程可以通过 acquire() 方法获取一个许可证，在执行完任务后通过 release() 方法释放许可证。
+
+限制访问数量: 可以使用 Semaphore 来限制同时访问共享资源的线程数量。在这个例子中，Semaphore 的初始许可证数量是1，因此只允许一个线程同时访问 HighLevelDisplay。
+Controlling Concurrent Access: The Semaphore maintains a count of available permits. Threads can acquire a permit using the acquire() method and release it using the release() method after completing their task.
+
+Limiting Access: Semaphore can be used to restrict the number of threads accessing a shared resource simultaneously. In this example, the Semaphore has an initial permit count of 1, allowing only one thread to access HighLevelDisplay at a time.
+
+3-5（只改了transferMoney）
+
+"Deadlock" in English refers to a situation in which two or more processes are unable to proceed because each is waiting for the other to release a resource.
+如果没有对账户按照余额大小进行排序，而是直接获取锁的顺序不固定，可能会导致动态锁顺序死锁的发生。这种情况下，两个账户的锁的获取顺序可能因为不同的线程而不同，如果两个线程分别按不同的顺序获取锁，就有可能发生死锁。
+
+举例来说，假设有两个账户 A 和 B，两个线程分别执行如下操作：
+
+线程1：
+
+想要进行转账操作，获取了 A 的锁。
+要转账给账户 B，尝试获取 B 的锁。
+线程2：
+
+想要进行转账操作，获取了 B 的锁。
+要转账给账户 A，尝试获取 A 的锁。
+在这种情况下，如果两个线程的锁获取顺序不一致，比如线程1先获取 A 的锁，线程2先获取 B 的锁，那么它们会因为互相持有对方所需的锁而陷入死锁状态。线程1持有 A 的锁在等待获取 B 的锁，而线程2持有 B 的锁在等待获取 A 的锁，彼此互相等待对方释放锁，导致程序无法继续执行。
+
+通过按照余额大小进行排序，固定了锁的获取顺序，保证了在转账操作中始终先获取余额较小的账户的锁，再获取另一个账户的锁，从而避免了不同线程获取锁顺序不一致导致的动态锁顺序死锁。
+
+
+4-1（任务：单线程变多线程）
+
+
+加了一个：
+ private static final Executor exec = Executors.newFixedThreadPool(100);
+改了main
+没了
+
+解释补充：
+Runnable 接口本身并不是一条线程，它是描述一个可运行任务的接口。在Java中，线程是通过Thread类来表示的，而不是Runnable接口。
+
+当我们创建一个Runnable对象并通过exec.execute(task)提交给线程池时，线程池内部会将这个Runnable对象封装成一个线程来执行。这个线程会执行Runnable对象的run()方法中的代码。所以说，Runnable对象并不是一条线程，但是它可以被线程执行，因此可以被认为是线程执行的任务。
+
+
+
+4-2（只改了main，加了线程池，改了try）
+将多个线程交给线程池执行
+"Submitting multiple threads to be executed by the thread pool."
+当需要处理大量文件时，使用单线程逐个处理可能效率较低。为了加速处理过程，可以引入多线程机制。Java中的ThreadPoolExecutor类允许你创建一个线程池，这个线程池可以维护多个线程，让它们并发执行任务，提高处理效率。
+
+在代码中，首先加载了停止词（stop_words），然后创建了一个Counter对象和一个ThreadPoolExecutor线程池。Files.walk方法遍历当前目录下的所有文件，paths.filter方法筛选出以.txt结尾的文件，并为每个文件创建一个新的任务（Runnable对象），将其交给线程池执行。每个任务调用countWords方法，处理相应的文件内容，并在Counter对象中记录词频统计。
+
+通过控制线程池中线程的数量，可以限制并发执行的任务数量，避免资源过度占用或者性能下降。最后，等待所有任务执行完成，关闭线程池，并输出词频统计结果以及程序的执行时间。
+
+这段代码是一个简单的词频统计程序。让我来解释它的主要部分：
+Counter 内部类：
+HashMap<String, Integer> frequencies：存储单词及其出现频率的映射。
+process(Path filepath) 方法：读取给定路径的文件并逐行处理文件内容。
+process(String line) 方法：对每行文本进行处理，将单词拆分出来并统计单词频率。
+sort() 方法：对单词频率进行排序，按照出现次数降序排列。
+merge(Counter other) 方法：合并另一个 Counter 对象的频率映射到当前对象中。
+toString() 方法：生成输出结果，显示前 40 个出现次数最多的单词和它们的频率。
+loadStopWords() 方法：从名为 "stop_words" 的文件中读取停止词列表，并将其加载到 stop_words 列表中。
+countWords(Path p, Counter c) 方法：处理给定路径的文件，调用 Counter 对象的 process() 方法来计算单词频率。
+这段代码的主要功能是读取文件中的文本内容，统计其中每个单词的出现次数，并按照出现次数降序排列，最后输出前 40 个出现次数最多的单词及其频率。同时，它从 "stop_words" 文件中加载停止词列表，用于过滤掉单词统计中不需要计算的常用词。
+
+
+这段代码是程序的主要入口点 main 方法。让我逐步解释它的作用：
+
+loadStopWords()：加载停止词列表。
+创建一个 Counter 对象 c 用于统计词频。
+long start = System.nanoTime();：记录程序开始执行的时间戳。
+try (Stream<Path> paths = Files.walk(Paths.get(".")))：使用 Java NIO 中的 Files.walk 方法遍历当前目录下的所有文件和子文件夹。
+.filter(p -> p.toString().endsWith(".txt"))：过滤出所有以 ".txt" 结尾的文件。
+.forEach(p -> countWords(p, c));：对每个被过滤出的 ".txt" 文件，调用 countWords 方法，传入文件路径和 Counter 对象 c 进行单词统计。
+catch (IOException e) { e.printStackTrace(); }：捕获任何文件操作可能出现的 IO 异常并打印异常信息。
+long end = System.nanoTime();：记录程序执行完成的时间戳。
+long elapsed = end - start;：计算程序执行时间。
+System.out.println(c);：输出词频统计结果。
+System.out.println("Elapsed time: " + elapsed/1000000 + "ms");：输出程序执行时间，以毫秒为单位。
+这段代码的主要作用是加载停止词列表，统计当前目录下所有 ".txt" 文件中单词的出现频率，并输出统计结果及程序的执行时间。
+
+
+5-1
+运行前记得删除out里面的txt
